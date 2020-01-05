@@ -2,4 +2,7 @@
     <string name="app_name">Ancestor Quotes</string>
     <string name="favorite">Favorite</string>
     <string name="search">Search</string>
+    <string name="favorites">Favorites</string>
+    <string name="about">About</string>
+    <string name="a_simple_darkest_dungeon_soundboard_application_for_android_the_application_looks_up_for_a_file_on_the_narrator_s_gamepedia_page_thanks_to_the_creators_and_maintainers_of_the_darkest_dungeon_gamepedia">A simple Darkest Dungeon soundboard application for Android. The application looks up for a file on the <a href="https://darkestdungeon.gamepedia.com/Narrator">Narrator\'s Gamepedia page</a>. Thanks to the creators and maintainers of the <a href="https://darkestdungeon.gamepedia.com/">Darkest Dungeon Gamepedia</a>.</string>
 </resources>

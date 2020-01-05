@@ -5,8 +5,14 @@
     <item android:id="@+id/iSearch"
         android:title="@string/search"
         android:icon="@drawable/search"
-        app:showAsAction="always|collapseActionView"
+        app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         />
+    <item android:title="@string/favorites"
+        android:id="@+id/iFavorites"
+        app:showAsAction="never"/>
+    <item android:title="@string/about"
+        android:id="@+id/iAbout"
+        app:showAsAction="never"/>
 
 </menu>

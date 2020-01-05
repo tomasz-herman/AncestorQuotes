@@ -6,15 +6,18 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Filterable;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity {
+public class FavoritesActivity extends AppCompatActivity {
 
     RecyclerView rvQuotes;
     FragmentManager fragmentManager;
@@ -23,15 +26,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_favorites);
         fragmentManager = getSupportFragmentManager();
         rvQuotes = findViewById(R.id.rvQuotes);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.favorites));
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Objects.requireNonNull(rvQuotes.getAdapter()).notifyDataSetChanged();
+    protected void onStart() {
+        super.onStart();
+        ArrayList<Quote> quotes = AncestorQuotes.database.getQuotes();
+        ArrayList<Quote> favorites = new ArrayList<>();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        for (Quote quote : quotes) if (prefs.contains(quote.getSource())) favorites.add(quote);
+        ((QuoteAdapter) Objects.requireNonNull(rvQuotes.getAdapter())).replaceData(favorites);
     }
 
     @Override
@@ -39,14 +47,10 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_search, menu);
         iSearch = menu.findItem(R.id.iSearch);
         iFavorites = menu.findItem(R.id.iFavorites);
-        iFavorites.setOnMenuItemClickListener(item -> {
-            Intent intent = new Intent(MainActivity.this, FavoritesActivity.class);
-            startActivity(intent);
-            return false;
-        });
+        iFavorites.setVisible(false);
         iAbout = menu.findItem(R.id.iAbout);
         iAbout.setOnMenuItemClickListener(item -> {
-            Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+            Intent intent = new Intent(FavoritesActivity.this, AboutActivity.class);
             startActivity(intent);
             return false;
         });
