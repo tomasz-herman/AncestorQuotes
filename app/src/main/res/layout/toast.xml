@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/llToast"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@color/colorPrimary"
+    android:padding="5dp"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/ivToast"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        app:srcCompat="@drawable/torch_lit"
+        android:contentDescription="@string/favorite"/>
+
+    <TextView
+        android:id="@+id/tvToast"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="6"
+        android:text=""
+        android:textColor="@color/colorPrimaryText"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:textStyle="bold|italic" />
+</LinearLayout>

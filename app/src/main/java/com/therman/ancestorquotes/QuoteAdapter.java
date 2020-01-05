@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,15 +27,17 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
     private ArrayList<Quote> quotes;
     private Context context;
     private MediaPlayer player;
+    private View view;
 
-    public QuoteAdapter(Context context, ArrayList<Quote> quotes) {
+    public QuoteAdapter(Context context, View view, ArrayList<Quote> quotes) {
         this.quotes = quotes;
         this.allQuotes = new ArrayList<>(quotes);
         this.context = context;
+        this.view = view;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvDialogFrom, tvDialogText;
+        TextView tvDialogText;
         ImageView ivFavorite;
 
         public ViewHolder(@NonNull View itemView) {
@@ -47,13 +51,19 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
 
         private void playQuote(View v) {
             Quote quote = (Quote) v.getTag();
-            MediaPlayer mediaPlayer = new MediaPlayer();
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             try {
-                mediaPlayer.setDataSource(quote.getSource());
-                mediaPlayer.setOnCompletionListener(MediaPlayer::release);
-                mediaPlayer.setOnPreparedListener(MediaPlayer::start);
-                mediaPlayer.prepareAsync();
+                if(player != null) {
+                    player.reset();
+                    player.release();
+                }
+            } catch (IllegalStateException ignored) {}
+            player = new MediaPlayer();
+            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            try {
+                player.setDataSource(quote.getSource());
+                player.setOnCompletionListener(MediaPlayer::release);
+                player.setOnPreparedListener(MediaPlayer::start);
+                player.prepareAsync();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -62,11 +72,13 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
         private void setFavorite(View v) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             if (prefs.contains((String) v.getTag())) {
-                ivFavorite.setImageResource(R.drawable.unfavorite);
+                ivFavorite.setImageResource(R.drawable.torch);
                 prefs.edit().remove((String) v.getTag()).apply();
+                showToast("Removed from favorites!", R.drawable.torch);
             } else {
-                ivFavorite.setImageResource(R.drawable.favorite);
+                ivFavorite.setImageResource(R.drawable.torch_lit);
                 prefs.edit().putBoolean((String) v.getTag(), true).apply();
+                showToast("Added to favorites!", R.drawable.torch_lit);
             }
         }
 
@@ -87,6 +99,19 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
+    public void showToast(String message, int image){
+        View toastView = LayoutInflater.from(context).inflate(R.layout.toast, view.findViewById(R.id.llToast));
+        TextView tvToast = toastView.findViewById(R.id.tvToast);
+        ImageView ivToast = toastView.findViewById(R.id.ivToast);
+        ivToast.setImageResource(image);
+        tvToast.setText(message);
+        Toast toast = new Toast(context);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(toastView);
+        toast.setGravity(Gravity.BOTTOM | Gravity.FILL_HORIZONTAL, 0, 0);
+        toast.show();
+    }
+
     @NonNull
     @Override
     public QuoteAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -100,8 +125,8 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
         holder.ivFavorite.setTag(quotes.get(position).getSource());
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         if (prefs.contains(quotes.get(position).getSource()))
-            holder.ivFavorite.setImageResource(R.drawable.favorite);
-        else holder.ivFavorite.setImageResource(R.drawable.unfavorite);
+            holder.ivFavorite.setImageResource(R.drawable.torch_lit);
+        else holder.ivFavorite.setImageResource(R.drawable.torch);
         holder.tvDialogText.setText(quotes.get(position).getText());
     }
 

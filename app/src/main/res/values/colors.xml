@@ -1,9 +1,9 @@
 <resources>
     <color name="colorPrimary">#200101</color>
     <color name="colorPrimaryDark">#000000</color>
-    <color name="colorPrimaryLight">#7A1717</color>
+    <color name="colorPrimaryLight">#680000</color>
     <color name="colorAccent">#440606</color>
-    <color name="colorPrimaryText">#E7BD81</color>
+    <color name="colorPrimaryText">#FFE7C0</color>
     <color name="colorSecondaryText">#ECECEC</color>
     <color name="colorIcons">#FFFFFF</color>
     <color name="colorDivider">#794949</color>

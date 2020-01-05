@@ -11,9 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-
-
 public class QuotesFragment extends Fragment {
     RecyclerView recyclerView;
     RecyclerView.Adapter adapter;
@@ -40,7 +37,7 @@ public class QuotesFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new QuoteAdapter(getActivity(), AncestorQuotes.database.getQuotes());
+        adapter = new QuoteAdapter(getActivity(), view, AncestorQuotes.database.getQuotes());
         recyclerView.setAdapter(adapter);
     }
 }
