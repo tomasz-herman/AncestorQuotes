@@ -23,8 +23,9 @@ public class QuotesDatabase {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 String audio = jsonObject.getString("audio");
+                String altAudio = jsonObject.getString("altAudio");
                 String text = jsonObject.getString("text");
-                quotes.add(new Quote(audio, text));
+                quotes.add(new Quote(audio, altAudio, text));
             }
         } catch (JSONException e) {
             e.printStackTrace();

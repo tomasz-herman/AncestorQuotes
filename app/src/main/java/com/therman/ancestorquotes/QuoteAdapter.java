@@ -60,7 +60,7 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
             player = new MediaPlayer();
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             try {
-                player.setDataSource(quote.getSource());
+                player.setDataSource(quote.getSourceOrAltSource());
                 player.setOnCompletionListener(MediaPlayer::release);
                 player.setOnPreparedListener(MediaPlayer::start);
                 player.prepareAsync();
