@@ -22,16 +22,41 @@
             android:textSize="32sp" />
 
         <TextView
-            android:id="@+id/tvAbout"
+            android:id="@+id/tvAbout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="15dp"
             android:layout_marginEnd="20dp"
-            android:text="@string/a_simple_darkest_dungeon_soundboard_application_for_android_the_application_looks_up_for_a_file_on_the_narrator_s_gamepedia_page_thanks_to_the_creators_and_maintainers_of_the_darkest_dungeon_gamepedia"
+            android:text="@string/about_paragraph_1"
             android:textColor="@color/colorPrimaryText"
             android:textColorLink="@color/colorSecondaryText"
             android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tvAbout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/about_paragraph_2"
+            android:textColor="@color/colorPrimaryText"
+            android:textColorLink="@color/colorSecondaryText"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tvAbout3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/about_paragraph_3"
+            android:textColor="@color/colorPrimaryText"
+            android:textColorLink="@color/colorSecondaryText"
+            android:textSize="18sp" />
+
 
     </LinearLayout>
 </ScrollView>
