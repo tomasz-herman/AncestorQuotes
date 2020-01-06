@@ -57,6 +57,17 @@
             android:textColorLink="@color/colorSecondaryText"
             android:textSize="18sp" />
 
+        <TextView
+            android:id="@+id/tvAbout4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/about_paragraph_4"
+            android:textColor="@color/colorPrimaryText"
+            android:textColorLink="@color/colorSecondaryText"
+            android:textSize="18sp" />
 
     </LinearLayout>
 </ScrollView>

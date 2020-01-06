@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public class AboutActivity extends AppCompatActivity {
 
-    TextView tvAbout1, tvAbout2, tvAbout3;
+    TextView tvAbout1, tvAbout2, tvAbout3, tvAbout4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +22,8 @@ public class AboutActivity extends AppCompatActivity {
         tvAbout2.setMovementMethod(LinkMovementMethod.getInstance());
         tvAbout3 = findViewById(R.id.tvAbout3);
         tvAbout3.setMovementMethod(LinkMovementMethod.getInstance());
+        tvAbout4 = findViewById(R.id.tvAbout4);
+        tvAbout4.setMovementMethod(LinkMovementMethod.getInstance());
         Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.about));
 
     }
