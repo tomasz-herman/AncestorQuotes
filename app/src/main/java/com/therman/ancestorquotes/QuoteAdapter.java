@@ -3,6 +3,7 @@ package com.therman.ancestorquotes;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -60,7 +62,8 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
             player = new MediaPlayer();
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             try {
-                player.setDataSource(quote.getSourceOrAltSource());
+                AssetFileDescriptor fd = context.getAssets().openFd(quote.getSourceOrAltSource() + ".wav.mp3");
+                player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
                 player.setOnCompletionListener(MediaPlayer::release);
                 player.setOnPreparedListener(MediaPlayer::start);
                 player.prepareAsync();
