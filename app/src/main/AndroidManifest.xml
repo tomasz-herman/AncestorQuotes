@@ -18,6 +18,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider android:name="com.therman.ancestorquotes.QuoteAdapter$Provider"
+            android:authorities="com.therman.ancestorquotes"
+            android:grantUriPermissions="true"
+            android:exported="true"/>
     </application>
 
 </manifest>

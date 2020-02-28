@@ -10,13 +10,19 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class QuotesDatabase {
 
     private ArrayList<Quote> quotes;
+    private ArrayList<String> categoriesList;
+    private HashMap<String, ArrayList<Quote>> categorizedQuotes;
 
     public QuotesDatabase(Context context) {
         quotes = new ArrayList<>();
+        categorizedQuotes = new HashMap<>();
+        categoriesList = new ArrayList<>();
         try {
             JSONObject obj = new JSONObject(loadQuotes(context));
             JSONArray jsonArray = obj.getJSONArray("quotes");
@@ -25,12 +31,46 @@ public class QuotesDatabase {
                 String audio = jsonObject.getString("audio");
                 String altAudio = jsonObject.getString("altAudio");
                 String text = jsonObject.getString("text");
-                quotes.add(new Quote(audio, altAudio, text));
+                Quote quote = new Quote(audio, altAudio, text);
+                quotes.add(quote);
+                String categories = jsonObject.getString("categories");
+                String[] cats = categories.split("\\|");
+                for (String category : cats) {
+                    if(categorizedQuotes.containsKey(category)){
+                        ArrayList<Quote> quoteList = categorizedQuotes.get(category);
+                        Objects.requireNonNull(quoteList).add(quote);
+                    }
+                    else {
+                        categoriesList.add(category);
+                        ArrayList<Quote> quoteList = new ArrayList<>();
+                        quoteList.add(quote);
+                        categorizedQuotes.put(category, quoteList);
+                    }
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        for (Quote quote : quotes) Log.d("Quote", quote.getText());
+        sort(categoriesList);
+    }
+
+    /*Function to sort array using insertion sort*/
+    private void sort(ArrayList<String> categoriesList)
+    {
+        int n = categoriesList.size();
+        for (int i = 1; i < n; ++i) {
+            String key = categoriesList.get(i);
+            int j = i - 1;
+
+            /* Move elements of arr[0..i-1], that are
+               greater than key, to one position ahead
+               of their current position */
+            while (j >= 0 && categoriesList.get(j).compareToIgnoreCase(key) > 0) {
+                categoriesList.set(j + 1, categoriesList.get(j));
+                j = j - 1;
+            }
+            categoriesList.set(j + 1, key);
+        }
     }
 
     public String loadQuotes(Context context) {
@@ -50,5 +90,13 @@ public class QuotesDatabase {
 
     public ArrayList<Quote> getQuotes() {
         return quotes;
+    }
+
+    public ArrayList<String> getCategories() {
+        return categoriesList;
+    }
+
+    public ArrayList<Quote> getCategorizedQuotes(String category) {
+        return categorizedQuotes.get(category);
     }
 }
