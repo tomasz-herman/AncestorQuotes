@@ -2,16 +2,20 @@ package com.therman.ancestorquotes;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Filterable;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -112,22 +116,20 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
 
     private void hideCategoriesShowQuotes(){
         fragmentManager.beginTransaction()
+                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
                 .hide(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.fragCategories)))
                 .show(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.fragQuotes)))
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
         if(iSearch != null) iSearch.setVisible(true);
-
     }
 
     private void showCategoriesHideQuotes(){
         fragmentManager.beginTransaction()
+                .setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right, R.anim.enter_from_right, R.anim.exit_to_left)
                 .show(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.fragCategories)))
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .hide(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.fragQuotes)))
                 .commit();
         if(iSearch != null) iSearch.setVisible(false);
-
     }
 
     private void showCategoriesAndQuotes(){
