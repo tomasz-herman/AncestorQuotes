@@ -8,15 +8,19 @@ import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.provider.OpenableColumns;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -24,13 +28,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URLConnection;
 import java.util.ArrayList;
 
 public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> implements Filterable {
@@ -49,56 +50,109 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
 
     public static class Provider extends ContentProvider {
 
-        public Provider(){
+        private final static String LOG_TAG = "CustomContentProvider";
 
+        private static final String[] COLUMNS = {
+                OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE };
+
+        @Override
+        public boolean onCreate() {
+            return true;
+        }
+
+        @Override
+        public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+            /**
+             * Source: {@link FileProvider#query(Uri, String[], String, String[], String)} .
+             */
+            if (projection == null) {
+                projection = COLUMNS;
+            }
+
+            final AssetManager am = getContext().getAssets();
+            final String path = getRelativePath(uri);
+            long fileSize = 0;
+            try {
+                final AssetFileDescriptor afd = am.openFd(path);
+                fileSize = afd.getLength();
+                afd.close();
+            } catch(IOException e) {
+                Log.e(LOG_TAG, "Can't open asset file", e);
+            }
+
+            final String[] cols = new String[projection.length];
+            final Object[] values = new Object[projection.length];
+            int i = 0;
+            for (String col : projection) {
+                if (OpenableColumns.DISPLAY_NAME.equals(col)) {
+                    cols[i] = OpenableColumns.DISPLAY_NAME;
+                    values[i++] = uri.getLastPathSegment();
+                } else if (OpenableColumns.SIZE.equals(col)) {
+                    cols[i] = OpenableColumns.SIZE;
+                    values[i++] = fileSize;
+                }
+            }
+
+            final MatrixCursor cursor = new MatrixCursor(cols, 1);
+            cursor.addRow(values);
+            return cursor;
+        }
+
+        @Override
+        public String getType(Uri uri) {
+            /**
+             * Source: {@link FileProvider#getType(Uri)} .
+             */
+            final String file_name = uri.getLastPathSegment();
+            final int lastDot = file_name.lastIndexOf('.');
+            if (lastDot >= 0) {
+                final String extension = file_name.substring(lastDot + 1);
+                final String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+                if (mime != null) {
+                    return mime;
+                }
+            }
+
+            return "application/octet-stream";
+        }
+
+        @Override
+        public Uri insert(Uri uri, ContentValues values) {
+            return null;
+        }
+
+        @Override
+        public int delete(Uri uri, String selection, String[] selectionArgs) {
+            return 0;
+        }
+
+        @Override
+        public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+            return 0;
         }
 
         @Override
         public AssetFileDescriptor openAssetFile(Uri uri, String mode) throws FileNotFoundException {
-            AssetManager am = getContext().getAssets();
-            String file_name = uri.getLastPathSegment();
-            if(file_name == null)
+            final AssetManager am = getContext().getAssets();
+            final String path = getRelativePath(uri);
+            if(path == null) {
                 throw new FileNotFoundException();
+            }
             AssetFileDescriptor afd = null;
             try {
-                afd = am.openFd(file_name);
-            } catch (IOException e) {
-                e.printStackTrace();
+                afd = am.openFd(path);
+            } catch(IOException e) {
+                Log.e(LOG_TAG, "Can't open asset file", e);
             }
-            return afd;//super.openAssetFile(uri, mode);
+            return afd;
         }
 
-        @Override
-        public boolean onCreate() {
-            return false;
-        }
-
-        @Nullable
-        @Override
-        public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-            return null;
-        }
-
-        @Nullable
-        @Override
-        public String getType(@NonNull Uri uri) {
-            return null;
-        }
-
-        @Nullable
-        @Override
-        public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-            return null;
-        }
-
-        @Override
-        public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-            return 0;
-        }
-
-        @Override
-        public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
-            return 0;
+        private String getRelativePath(Uri uri) {
+            String path = uri.getPath();
+            if (path.charAt(0) == '/') {
+                path = path.substring(1);
+            }
+            return path;
         }
     }
 
