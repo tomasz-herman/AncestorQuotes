@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
                 .show(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.fragQuotes)))
                 .commit();
         if(iSearch != null) iSearch.setVisible(true);
+        setTitle(lastCategory);
     }
 
     private void showCategoriesHideQuotes(){
@@ -125,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
                 .hide(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.fragQuotes)))
                 .commit();
         if(iSearch != null) iSearch.setVisible(false);
+        setTitle(getString(R.string.app_name));
     }
 
     private void showCategoriesAndQuotes(){
@@ -133,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
                 .show(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.fragQuotes)))
                 .commit();
         if(iSearch != null) iSearch.setVisible(true);
+        setTitle(getString(R.string.app_name) + " - " + lastCategory);
     }
 
     @Override
@@ -143,5 +146,9 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         if(isLandscapeMode()){
             ((Filterable) Objects.requireNonNull(rvQuotes.getAdapter())).getFilter().filter(((SearchView)iSearch.getActionView()).getQuery());
         }
+    }
+
+    public void setTitle(String title){
+        Objects.requireNonNull(getSupportActionBar()).setTitle(title);
     }
 }
