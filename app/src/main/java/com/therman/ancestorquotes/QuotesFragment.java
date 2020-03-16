@@ -2,6 +2,7 @@ package com.therman.ancestorquotes;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,6 +22,9 @@ public class QuotesFragment extends Fragment {
         // Required empty public constructor
     }
 
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,5 +43,10 @@ public class QuotesFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         adapter = new QuoteAdapter(getActivity(), view, AncestorQuotes.database.getQuotes());
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 }

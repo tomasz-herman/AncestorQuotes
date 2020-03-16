@@ -212,6 +212,12 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
             shareIntent.setType("audio/*");
             shareIntent.putExtra(android.content.Intent.EXTRA_TEXT,((Quote)v.getTag()).getSource());
             context.startActivity(shareIntent);
+//            Quote quote = (Quote) v.getTag();
+//            Intent i = new Intent(Intent.ACTION_SEND);
+//            i.setType("text/plain");
+//            i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
+//            i.putExtra(Intent.EXTRA_TEXT, "https://raw.githubusercontent.com/tomasz-herman/AncestorQuotes/master/app/src/main/assets/" + quote.getSource() + ".wav.mp3");
+//            context.startActivity(Intent.createChooser(i, "Share URL"));
             return true;
         }
     }

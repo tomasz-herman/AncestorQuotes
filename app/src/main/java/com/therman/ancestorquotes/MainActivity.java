@@ -1,9 +1,13 @@
 package com.therman.ancestorquotes;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +21,13 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements CategoryAdapter.ItemClicked {
 
-    RecyclerView rvQuotes;
+    private static final int NUM_PAGES = 2;
+
+    private Fragment categoriesFragment, quotesFragment;
+    private ViewPager2 viewPager;
+    private FragmentStateAdapter  pagerAdapter;
+
+    //RecyclerView rvQuotes;
     FragmentManager fragmentManager;
     MenuItem iSearch, iFavorites, iAbout;
     static String lastCategory = "All";
@@ -28,37 +38,52 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fragmentManager = getSupportFragmentManager();
-        rvQuotes = findViewById(R.id.rvQuotes);
-        adjustFragments();
+        if (savedInstanceState != null) {
+            categoriesFragment = getSupportFragmentManager().getFragment(savedInstanceState, "categoriesFragment");
+            quotesFragment = getSupportFragmentManager().getFragment(savedInstanceState, "quotesFragment");
+        } else {
+            categoriesFragment = new CategoriesFragment();
+            quotesFragment = new QuotesFragment();
+        }
+        viewPager = findViewById(R.id.vpPager);
+        pagerAdapter = new ScreenSlidePagerAdapter(this);
+        viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(2);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getSupportFragmentManager().putFragment(outState, "categoriesFragment", categoriesFragment);
+        getSupportFragmentManager().putFragment(outState, "quotesFragment", quotesFragment);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Objects.requireNonNull(rvQuotes.getAdapter()).notifyDataSetChanged();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        filterQuotes(lastCategory);
     }
 
     @Override
     public void onBackPressed() {
-        if(isLandscapeMode() || !shownQuotesFragment){
+        if(!shownQuotesFragment){
             lastCategory = "All";
             shownQuotesFragment = false;
             super.onBackPressed();
         } else {
             shownQuotesFragment = false;
-            showCategoriesHideQuotes();
+//            showCategoriesHideQuotes();
         }
     }
 
     private void filterQuotes(String category){
         ArrayList<Quote> quotes = AncestorQuotes.database.getCategorizedQuotes(category);
-        ((QuoteAdapter) Objects.requireNonNull(rvQuotes.getAdapter())).replaceData(quotes);
+        if(((QuotesFragment)quotesFragment).getRecyclerView()==null)
+        ((QuoteAdapter) Objects.requireNonNull(((QuotesFragment)quotesFragment).getRecyclerView().getAdapter())).replaceData(quotes);
     }
 
     @Override
@@ -87,68 +112,52 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                ((Filterable) Objects.requireNonNull(rvQuotes.getAdapter())).getFilter().filter(newText);
+                ((Filterable) Objects.requireNonNull(((QuotesFragment)quotesFragment).getRecyclerView().getAdapter())).getFilter().filter(newText);
                 return false;
             }
         });
         return super.onCreateOptionsMenu(menu);
     }
 
-    private boolean isPortraitMode(){
-        return findViewById(R.id.layout_portrait) != null;
-    }
-
-    private boolean isLandscapeMode(){
-        return findViewById(R.id.layout_landscape) != null;
-    }
-
-    private void adjustFragments(){
-        if(isPortraitMode())
-            if (shownQuotesFragment) hideCategoriesShowQuotes();
-            else showCategoriesHideQuotes();
-        if(isLandscapeMode()) showCategoriesAndQuotes();
-    }
-
-    private void hideCategoriesShowQuotes(){
-        fragmentManager.beginTransaction()
-                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-                .hide(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.fragCategories)))
-                .show(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.fragQuotes)))
-                .commit();
-        if(iSearch != null) iSearch.setVisible(true);
-        setTitle(lastCategory);
-    }
-
-    private void showCategoriesHideQuotes(){
-        fragmentManager.beginTransaction()
-                .setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right, R.anim.enter_from_right, R.anim.exit_to_left)
-                .show(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.fragCategories)))
-                .hide(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.fragQuotes)))
-                .commit();
-        if(iSearch != null) iSearch.setVisible(false);
-        setTitle(getString(R.string.app_name));
-    }
-
-    private void showCategoriesAndQuotes(){
-        fragmentManager.beginTransaction()
-                .show(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.fragCategories)))
-                .show(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.fragQuotes)))
-                .commit();
-        if(iSearch != null) iSearch.setVisible(true);
-        setTitle(getString(R.string.app_name) + " - " + lastCategory);
-    }
+//    private boolean isPortraitMode(){
+//        return findViewById(R.id.layout_portrait) != null;
+//    }
+//
+//    private boolean isLandscapeMode(){
+//        return findViewById(R.id.layout_landscape) != null;
+//    }
 
     @Override
     public void onItemClicked(String category) {
         filterQuotes(lastCategory = category);
         shownQuotesFragment = true;
-        if(findViewById(R.id.layout_portrait) != null) hideCategoriesShowQuotes();
-        if(isLandscapeMode()){
-            ((Filterable) Objects.requireNonNull(rvQuotes.getAdapter())).getFilter().filter(((SearchView)iSearch.getActionView()).getQuery());
-        }
+        viewPager.setCurrentItem(1, true);
+        ((Filterable) Objects.requireNonNull(((QuotesFragment)quotesFragment).getRecyclerView().getAdapter())).getFilter().filter(((SearchView)iSearch.getActionView()).getQuery());
     }
 
     public void setTitle(String title){
-        Objects.requireNonNull(getSupportActionBar()).setTitle(title);
+        Objects.requireNonNull(getActionBar()).setTitle(title);
     }
+
+
+    private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
+
+        ScreenSlidePagerAdapter(FragmentActivity fa) {
+            super(fa);
+        }
+
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            if(position == 0)return categoriesFragment;
+            else return quotesFragment;
+        }
+
+        @Override
+        public int getItemCount() {
+            return NUM_PAGES;
+        }
+
+    }
+
 }
