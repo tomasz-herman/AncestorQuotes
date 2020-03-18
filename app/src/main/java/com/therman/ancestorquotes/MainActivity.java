@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
             lastCategory = savedInstanceState.getString("lastCategory");
             searchQuery = savedInstanceState.getString("searchQuery");
             shownQuotesFragment = savedInstanceState.getBoolean("shownQuotesFragment");
+            setTitle(lastCategory);
+            filterQuotes(lastCategory);
         } else {
             categoriesFragment = new CategoriesFragment();
             quotesFragment = new QuotesFragment();
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
             if(searchView.getQuery().length() != 0){
                 searchQuery = "" + searchView.getQuery();
             }
-        }
+        } else searchQuery = "";
     }
 
     @Override
@@ -171,10 +173,12 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         shownQuotesFragment = true;
         viewPager.setCurrentItem(1, true);
         ((Filterable) Objects.requireNonNull(((QuotesFragment)quotesFragment).getRecyclerView().getAdapter())).getFilter().filter(((SearchView)iSearch.getActionView()).getQuery());
+        setTitle(category);
     }
 
     public void setTitle(String title){
-        Objects.requireNonNull(getActionBar()).setTitle(title);
+        Log.d(TAG, "setTitle: " + (getSupportActionBar() == null));
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Ancestor Quotes " + title);
     }
 
 
