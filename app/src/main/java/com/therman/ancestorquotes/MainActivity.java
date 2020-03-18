@@ -11,6 +11,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
@@ -22,6 +23,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity implements CategoryAdapter.ItemClicked {
 
     private static final int NUM_PAGES = 2;
+    private static final String TAG = "MainActivity";
 
     private Fragment categoriesFragment, quotesFragment;
     private ViewPager2 viewPager;
@@ -62,6 +64,12 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        restoreState(savedInstanceState);
+    }
+
+    @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         getSupportFragmentManager().putFragment(outState, "categoriesFragment", categoriesFragment);
@@ -69,6 +77,17 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         outState.putString("lastCategory", lastCategory);
         outState.putString("searchQuery", searchQuery);
         outState.putBoolean("shownQuotesFragment", shownQuotesFragment);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(iSearch.isActionViewExpanded()){
+            SearchView searchView = (SearchView) iSearch.getActionView();
+            if(searchView.getQuery().length() != 0){
+                searchQuery = "" + searchView.getQuery();
+            }
+        }
     }
 
     @Override
@@ -120,16 +139,21 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                searchQuery = query;
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                searchQuery = newText;
                 ((Filterable) Objects.requireNonNull(((QuotesFragment)quotesFragment).getRecyclerView().getAdapter())).getFilter().filter(newText);
                 return false;
             }
         });
+        if(!searchQuery.isEmpty()){
+            iSearch.expandActionView();
+            searchView.setQuery(searchQuery, false);
+            searchView.clearFocus();
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
