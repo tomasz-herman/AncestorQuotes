@@ -30,25 +30,35 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
     //RecyclerView rvQuotes;
     FragmentManager fragmentManager;
     MenuItem iSearch, iFavorites, iAbout;
-    static String lastCategory = "All";
-    static boolean shownQuotesFragment = false;
+    String lastCategory, searchQuery;
+    boolean shownQuotesFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fragmentManager = getSupportFragmentManager();
-        if (savedInstanceState != null) {
-            categoriesFragment = getSupportFragmentManager().getFragment(savedInstanceState, "categoriesFragment");
-            quotesFragment = getSupportFragmentManager().getFragment(savedInstanceState, "quotesFragment");
-        } else {
-            categoriesFragment = new CategoriesFragment();
-            quotesFragment = new QuotesFragment();
-        }
+        restoreState(savedInstanceState);
         viewPager = findViewById(R.id.vpPager);
         pagerAdapter = new ScreenSlidePagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
         viewPager.setOffscreenPageLimit(2);
+    }
+
+    private void restoreState(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            categoriesFragment = getSupportFragmentManager().getFragment(savedInstanceState, "categoriesFragment");
+            quotesFragment = getSupportFragmentManager().getFragment(savedInstanceState, "quotesFragment");
+            lastCategory = savedInstanceState.getString("lastCategory");
+            searchQuery = savedInstanceState.getString("searchQuery");
+            shownQuotesFragment = savedInstanceState.getBoolean("shownQuotesFragment");
+        } else {
+            categoriesFragment = new CategoriesFragment();
+            quotesFragment = new QuotesFragment();
+            lastCategory = "All";
+            searchQuery = "";
+            shownQuotesFragment = false;
+        }
     }
 
     @Override
@@ -56,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         super.onSaveInstanceState(outState);
         getSupportFragmentManager().putFragment(outState, "categoriesFragment", categoriesFragment);
         getSupportFragmentManager().putFragment(outState, "quotesFragment", quotesFragment);
+        outState.putString("lastCategory", lastCategory);
+        outState.putString("searchQuery", searchQuery);
+        outState.putBoolean("shownQuotesFragment", shownQuotesFragment);
     }
 
     @Override
@@ -82,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
 
     private void filterQuotes(String category){
         ArrayList<Quote> quotes = AncestorQuotes.database.getCategorizedQuotes(category);
-        if(((QuotesFragment)quotesFragment).getRecyclerView()==null)
+        if(((QuotesFragment)quotesFragment).getRecyclerView()!=null)
         ((QuoteAdapter) Objects.requireNonNull(((QuotesFragment)quotesFragment).getRecyclerView().getAdapter())).replaceData(quotes);
     }
 
@@ -112,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                searchQuery = newText;
                 ((Filterable) Objects.requireNonNull(((QuotesFragment)quotesFragment).getRecyclerView().getAdapter())).getFilter().filter(newText);
                 return false;
             }

@@ -12,9 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.stream.Collectors;
-
-
 /**
  * A simple {@link Fragment} subclass.
  */
