@@ -51,6 +51,17 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             viewPager.setPageTransformer(new DepthPageTransformer());
         } else viewPager.setPageTransformer(new ZoomOutPageTransformer());
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                if(position == 0){
+                    setTitle(getString(R.string.app_name));
+                } else {
+                    setTitle(lastCategory);
+                }
+            }
+        });
     }
 
     private void restoreState(Bundle savedInstanceState) {
@@ -176,12 +187,11 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         shownQuotesFragment = true;
         viewPager.setCurrentItem(1, true);
         ((Filterable) Objects.requireNonNull(((QuotesFragment)quotesFragment).getRecyclerView().getAdapter())).getFilter().filter(((SearchView)iSearch.getActionView()).getQuery());
-        setTitle(category);
     }
 
     public void setTitle(String title){
         Log.d(TAG, "setTitle: " + (getSupportActionBar() == null));
-        Objects.requireNonNull(getSupportActionBar()).setTitle("Ancestor Quotes " + title);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(title);
     }
 
 
