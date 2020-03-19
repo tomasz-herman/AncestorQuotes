@@ -171,23 +171,7 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
 
         private void playQuote(View v) {
             Quote quote = (Quote) v.getTag();
-            try {
-                if(player != null) {
-                    player.reset();
-                    player.release();
-                }
-            } catch (IllegalStateException ignored) {}
-            player = new MediaPlayer();
-            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            try {
-                AssetFileDescriptor fd = context.getAssets().openFd(quote.getSourceOrAltSource() + ".wav.mp3");
-                player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
-                player.setOnCompletionListener(MediaPlayer::release);
-                player.setOnPreparedListener(MediaPlayer::start);
-                player.prepareAsync();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            AncestorQuotes.playQuote(quote);
         }
 
         private void setFavorite(View v) {
