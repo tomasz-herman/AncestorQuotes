@@ -104,13 +104,10 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
 
     @Override
     public void onBackPressed() {
-        if(!shownQuotesFragment){
-            lastCategory = "All";
-            shownQuotesFragment = false;
+        if (viewPager.getCurrentItem() == 0) {
             super.onBackPressed();
         } else {
-            shownQuotesFragment = false;
-//            showCategoriesHideQuotes();
+            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
         }
     }
 
