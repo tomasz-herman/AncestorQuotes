@@ -3,6 +3,7 @@ package com.therman.ancestorquotes;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,7 +27,6 @@ public class CategoriesFragment extends Fragment {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -36,8 +36,8 @@ public class CategoriesFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         recyclerView = view.findViewById(R.id.rvCategories);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getActivity());
@@ -45,5 +45,4 @@ public class CategoriesFragment extends Fragment {
         adapter = new CategoryAdapter(getActivity(), AncestorQuotes.database.getCategories());
         recyclerView.setAdapter(adapter);
     }
-
 }
