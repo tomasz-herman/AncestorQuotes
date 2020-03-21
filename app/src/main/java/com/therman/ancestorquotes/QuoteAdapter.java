@@ -176,13 +176,26 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
 
         private void setFavorite(View v) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            if (prefs.contains((String) v.getTag())) {
+            ArrayList<Quote> favorites = AncestorQuotes.database.getFavorites();
+            String source = (String) v.getTag();
+            if (prefs.contains(source)) {
                 ivFavorite.setImageResource(R.drawable.torch);
-                prefs.edit().remove((String) v.getTag()).apply();
+                prefs.edit().remove(source).apply();
+                for (int i = 0; i < favorites.size(); i++)
+                    if (favorites.get(i).getSource().equals(source)) {
+                        favorites.remove(i);
+                        break;
+                    }
                 showToast("Removed from favorites!", R.drawable.torch);
             } else {
                 ivFavorite.setImageResource(R.drawable.torch_lit);
-                prefs.edit().putBoolean((String) v.getTag(), true).apply();
+                prefs.edit().putBoolean(source, true).apply();
+                for (int i = 0; i < allQuotes.size(); i++) {
+                    if(allQuotes.get(i).getSource().equals(source)){
+                        favorites.add(allQuotes.get(i));
+                        break;
+                    }
+                }
                 showToast("Added to favorites!", R.drawable.torch_lit);
             }
         }

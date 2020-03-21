@@ -1,7 +1,8 @@
 package com.therman.ancestorquotes;
 
 import android.content.Context;
-import android.util.Log;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,11 +17,14 @@ import java.util.Objects;
 public class QuotesDatabase {
 
     private ArrayList<Quote> quotes;
+    private ArrayList<Quote> favorites;
     private ArrayList<String> categoriesList;
     private HashMap<String, ArrayList<Quote>> categorizedQuotes;
 
     public QuotesDatabase(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         quotes = new ArrayList<>();
+        favorites = new ArrayList<>();
         categorizedQuotes = new HashMap<>();
         categoriesList = new ArrayList<>();
         try {
@@ -33,6 +37,7 @@ public class QuotesDatabase {
                 String text = jsonObject.getString("text");
                 Quote quote = new Quote(audio, altAudio, text);
                 quotes.add(quote);
+                if (prefs.contains(audio)) favorites.add(quote);
                 String categories = jsonObject.getString("categories");
                 String[] cats = categories.split("\\|");
                 for (String category : cats) {
@@ -48,10 +53,14 @@ public class QuotesDatabase {
                     }
                 }
             }
+            categorizedQuotes.put("All", quotes);
+            categorizedQuotes.put("Favorites", favorites);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         sort(categoriesList);
+        categoriesList.add(0, "Favorites");
+        categoriesList.add(0, "All");
     }
 
     /*Function to sort array using insertion sort*/
@@ -90,6 +99,10 @@ public class QuotesDatabase {
 
     public ArrayList<Quote> getQuotes() {
         return quotes;
+    }
+
+    public ArrayList<Quote> getFavorites() {
+        return favorites;
     }
 
     public ArrayList<String> getCategories() {

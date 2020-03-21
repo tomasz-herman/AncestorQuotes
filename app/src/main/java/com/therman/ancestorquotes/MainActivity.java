@@ -113,7 +113,8 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
     @Override
     protected void onPause() {
         super.onPause();
-        if(iSearch.isActionViewExpanded()){
+        if(iSearch == null) iSearch = findViewById(R.id.iSearch);
+        if(iSearch != null && iSearch.isActionViewExpanded()){
             SearchView searchView = (SearchView) iSearch.getActionView();
             if(searchView.getQuery().length() != 0){
                 searchQuery = "" + searchView.getQuery();
@@ -152,8 +153,7 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         iSearch = menu.findItem(R.id.iSearch);
         iFavorites = menu.findItem(R.id.iFavorites);
         iFavorites.setOnMenuItemClickListener(item -> {
-            Intent intent = new Intent(MainActivity.this, FavoritesActivity.class);
-            startActivity(intent);
+            onItemClicked("Favorites");
             return false;
         });
         iAbout = menu.findItem(R.id.iAbout);
