@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,8 +16,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Interpolator;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Filterable;
+import android.widget.Scroller;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -63,7 +66,21 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
             }
         });
         setViewpagerSlideSensitivity(viewPager, 100);
+        changeViewpagerScroller(viewPager);
     }
+
+    private static void changeViewpagerScroller(ViewPager viewPager) {
+        try {
+            Field mScroller;
+            mScroller = ViewPager.class.getDeclaredField("mScroller");
+            mScroller.setAccessible(true);
+            ViewPagerScroller scroller = new ViewPagerScroller(viewPager.getContext());
+            mScroller.set(viewPager, scroller);
+        } catch (Exception e) {
+            Log.e(TAG, "error of change scroller ", e);
+        }
+    }
+
 
     private static void setViewpagerSlideSensitivity(ViewPager viewPager, int value){
         try {
@@ -311,5 +328,26 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         }
     }
 
+    public static class ViewPagerScroller extends Scroller {
+        private int mScrollDuration = 900;
+
+        public ViewPagerScroller(Context context) {
+            super(context);
+        }
+
+        public ViewPagerScroller(Context context, Interpolator interpolator) {
+            super(context, interpolator);
+        }
+
+        @Override
+        public void startScroll(int startX, int startY, int dx, int dy, int duration) {
+            super.startScroll(startX, startY, dx, dy, mScrollDuration);
+        }
+
+        @Override
+        public void startScroll(int startX, int startY, int dx, int dy) {
+            super.startScroll(startX, startY, dx, dy, mScrollDuration);
+        }
+    }
 
 }
