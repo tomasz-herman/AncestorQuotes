@@ -1,15 +1,12 @@
 package com.therman.ancestorquotes;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Build;
@@ -31,8 +28,8 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
     private static final String TAG = "MainActivity";
 
     private Fragment categoriesFragment, quotesFragment;
-    private ViewPager2 viewPager;
-    private FragmentStateAdapter  pagerAdapter;
+    private ViewPager viewPager;
+    private FragmentStatePagerAdapter pagerAdapter;
 
     //RecyclerView rvQuotes;
     FragmentManager fragmentManager;
@@ -47,13 +44,14 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         fragmentManager = getSupportFragmentManager();
         restoreState(savedInstanceState);
         viewPager = findViewById(R.id.vpPager);
-        pagerAdapter = new ScreenSlidePagerAdapter(this);
+        pagerAdapter = new ScreenSlidePagerAdapter(fragmentManager);
         viewPager.setAdapter(pagerAdapter);
         viewPager.setOffscreenPageLimit(2);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            viewPager.setPageTransformer(new DepthPageTransformer());
-        } else viewPager.setPageTransformer(new ZoomOutPageTransformer());
-        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+        if(isPortraitMode())
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                viewPager.setPageTransformer(true, new DepthPageTransformer());
+            } else viewPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
@@ -64,18 +62,15 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
                 }
             }
         });
-        decreaseViewpagerSlideSensitivity(viewPager, 4);
+        setViewpagerSlideSensitivity(viewPager, 100);
     }
 
-    private static void decreaseViewpagerSlideSensitivity(ViewPager2 viewPager, int factor){
+    private static void setViewpagerSlideSensitivity(ViewPager viewPager, int value){
         try {
-            Field recyclerViewField = ViewPager2.class.getDeclaredField("mRecyclerView");
-            recyclerViewField.setAccessible(true);
-            RecyclerView recyclerView = (RecyclerView) recyclerViewField.get(viewPager);
-            Field touchSlopField = RecyclerView.class.getDeclaredField("mTouchSlop");
-            touchSlopField.setAccessible(true);
-            int touchSlop = (int) touchSlopField.get(recyclerView);
-            touchSlopField.set(recyclerView, touchSlop * factor);
+            Field mFlingDistance;
+            mFlingDistance = ViewPager.class.getDeclaredField("mFlingDistance");
+            mFlingDistance.setAccessible(true);
+            mFlingDistance.set(viewPager, value);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -190,13 +185,13 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         return super.onCreateOptionsMenu(menu);
     }
 
-//    private boolean isPortraitMode(){
-//        return findViewById(R.id.layout_portrait) != null;
-//    }
-//
-//    private boolean isLandscapeMode(){
-//        return findViewById(R.id.layout_landscape) != null;
-//    }
+    private boolean isPortraitMode(){
+        return findViewById(R.id.layout_portrait) != null;
+    }
+
+    private boolean isLandscapeMode(){
+        return findViewById(R.id.layout_landscape) != null;
+    }
 
     @Override
     public void onItemClicked(String category) {
@@ -212,28 +207,35 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
     }
 
 
-    private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
-        ScreenSlidePagerAdapter(FragmentActivity fa) {
-            super(fa);
+        ScreenSlidePagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public int getCount() {
+            return NUM_PAGES;
         }
 
         @NonNull
         @Override
-        public Fragment createFragment(int position) {
+        public Fragment getItem(int position) {
             if(position == 0)return categoriesFragment;
             else return quotesFragment;
         }
 
         @Override
-        public int getItemCount() {
-            return NUM_PAGES;
+        public float getPageWidth(int position) {
+            if(isPortraitMode())return 1.0f;
+            else {
+                if(position == 0) return 1.0f/ 3.0f;
+                else return 2.0f/ 3.0f;
+            }
         }
-
     }
 
-    @RequiresApi(21)
-    private static class DepthPageTransformer implements ViewPager2.PageTransformer {
+    public static class DepthPageTransformer implements ViewPager.PageTransformer {
         private static final float MIN_SCALE = 0.75f;
 
         public void transformPage(View view, float position) {
@@ -247,7 +249,6 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
                 // Use the default slide transition when moving to the left page
                 view.setAlpha(1f);
                 view.setTranslationX(0f);
-                view.setTranslationZ(0f);
                 view.setScaleX(1f);
                 view.setScaleY(1f);
 
@@ -257,8 +258,6 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
 
                 // Counteract the default slide transition
                 view.setTranslationX(pageWidth * -position);
-                // Move it behind the left page
-                view.setTranslationZ(-1f);
 
                 // Scale the page down (between MIN_SCALE and 1)
                 float scaleFactor = MIN_SCALE
@@ -273,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         }
     }
 
-    private static class ZoomOutPageTransformer implements ViewPager2.PageTransformer {
+    public static class ZoomOutPageTransformer implements ViewPager.PageTransformer {
         private static final float MIN_SCALE = 0.85f;
         private static final float MIN_ALPHA = 0.5f;
 
