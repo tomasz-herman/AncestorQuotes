@@ -8,7 +8,7 @@
     tools:context=".FavoritesActivity">
 
     <fragment
-        android:id="@+id/fragment2"
+        android:id="@+id/fragmentFavoriteQuotes"
         android:name="com.therman.ancestorquotes.QuotesFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

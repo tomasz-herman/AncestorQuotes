@@ -171,23 +171,7 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
 
         private void playQuote(View v) {
             Quote quote = (Quote) v.getTag();
-            try {
-                if(player != null) {
-                    player.reset();
-                    player.release();
-                }
-            } catch (IllegalStateException ignored) {}
-            player = new MediaPlayer();
-            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            try {
-                AssetFileDescriptor fd = context.getAssets().openFd(quote.getSourceOrAltSource() + ".wav.mp3");
-                player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
-                player.setOnCompletionListener(MediaPlayer::release);
-                player.setOnPreparedListener(MediaPlayer::start);
-                player.prepareAsync();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            AncestorQuotes.playQuote(quote);
         }
 
         private void setFavorite(View v) {
@@ -212,6 +196,12 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
             shareIntent.setType("audio/*");
             shareIntent.putExtra(android.content.Intent.EXTRA_TEXT,((Quote)v.getTag()).getSource());
             context.startActivity(shareIntent);
+//            Quote quote = (Quote) v.getTag();
+//            Intent i = new Intent(Intent.ACTION_SEND);
+//            i.setType("text/plain");
+//            i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
+//            i.putExtra(Intent.EXTRA_TEXT, "https://raw.githubusercontent.com/tomasz-herman/AncestorQuotes/master/app/src/main/assets/" + quote.getSource() + ".wav.mp3");
+//            context.startActivity(Intent.createChooser(i, "Share URL"));
             return true;
         }
     }
