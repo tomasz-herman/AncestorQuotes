@@ -7,6 +7,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Filterable;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -62,6 +64,21 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
                 }
             }
         });
+        decreaseViewpagerSlideSensitivity(viewPager, 4);
+    }
+
+    private static void decreaseViewpagerSlideSensitivity(ViewPager2 viewPager, int factor){
+        try {
+            Field recyclerViewField = ViewPager2.class.getDeclaredField("mRecyclerView");
+            recyclerViewField.setAccessible(true);
+            RecyclerView recyclerView = (RecyclerView) recyclerViewField.get(viewPager);
+            Field touchSlopField = RecyclerView.class.getDeclaredField("mTouchSlop");
+            touchSlopField.setAccessible(true);
+            int touchSlop = (int) touchSlopField.get(recyclerView);
+            touchSlopField.set(recyclerView, touchSlop * factor);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     private void restoreState(Bundle savedInstanceState) {
