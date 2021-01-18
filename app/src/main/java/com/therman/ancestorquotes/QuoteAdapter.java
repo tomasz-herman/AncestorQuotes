@@ -9,27 +9,32 @@ import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
+import android.media.MediaMetadataRetriever;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,9 +42,8 @@ import java.util.ArrayList;
 public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> implements Filterable {
     private ArrayList<Quote> allQuotes;
     private ArrayList<Quote> quotes;
-    private Context context;
-    private MediaPlayer player;
-    private View view;
+    private final Context context;
+    private final View view;
 
     public QuoteAdapter(Context context, View view, ArrayList<Quote> quotes) {
         this.quotes = quotes;
@@ -165,13 +169,25 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
             tvDialogText = itemView.findViewById(R.id.tvQuoteText);
             ivFavorite = itemView.findViewById(R.id.ivFavorite);
             itemView.setOnClickListener(this::playQuote);
-            itemView.setOnLongClickListener(this::shareDialog);
+            itemView.setOnLongClickListener(this::showOptionsMenu);
             ivFavorite.setOnClickListener(this::setFavorite);
         }
 
         private void playQuote(View v) {
             Quote quote = (Quote) v.getTag();
             AncestorQuotes.playQuote(quote);
+        }
+
+        private void setRingtone(View v) {
+            Uri theUri = Uri.parse("content://com.therman.ancestorquotes/" + ((Quote)v.getTag()).getSourceOrAltSource() + ".wav.mp3");
+
+            RingtoneManager.setActualDefaultRingtoneUri(context,
+                    RingtoneManager.TYPE_RINGTONE, theUri);
+        }
+
+        private void saveLocally(View v) {
+            Quote quote = (Quote)v.getTag();
+
         }
 
         private void setFavorite(View v) {
@@ -181,11 +197,12 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
             if (prefs.contains(source)) {
                 ivFavorite.setImageResource(R.drawable.torch);
                 prefs.edit().remove(source).apply();
-                for (int i = 0; i < favorites.size(); i++)
+                for (int i = 0; i < favorites.size(); i++) {
                     if (favorites.get(i).getSource().equals(source)) {
                         favorites.remove(i);
                         break;
                     }
+                }
                 showToast("Removed from favorites!", R.drawable.torch);
             } else {
                 ivFavorite.setImageResource(R.drawable.torch_lit);
@@ -198,6 +215,36 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
                 }
                 showToast("Added to favorites!", R.drawable.torch_lit);
             }
+        }
+
+        private boolean showOptionsMenu(View v) {
+            PopupMenu menu = new PopupMenu(context, v);
+            MenuInflater inflater = menu.getMenuInflater();
+            inflater.inflate(R.menu.menu_quote, menu.getMenu());
+            menu.show();
+            menu.setOnMenuItemClickListener(item -> onOptionsMenuItemClick(item, v));
+            return true;
+        }
+
+        public boolean onOptionsMenuItemClick(MenuItem item, View v) {
+            int itemId = item.getItemId();
+            if (itemId == R.id.iPlayQuote) {
+                playQuote(v);
+                return true;
+            } else if (itemId == R.id.iShareQuote) {
+                shareDialog(v);
+                return true;
+            } else if (itemId == R.id.iShareQuoteUrl) {
+                shareDialogUrl(v);
+                return true;
+            } else if (itemId == R.id.iSetAsRingtone) {
+                setRingtone(v);
+                return true;
+            } else if (itemId == R.id.iSaveLocally) {
+                return true;
+            }
+            return false;
+
         }
 
         private boolean shareDialog(View v) {
@@ -215,6 +262,16 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
 //            i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
 //            i.putExtra(Intent.EXTRA_TEXT, "https://raw.githubusercontent.com/tomasz-herman/AncestorQuotes/master/app/src/main/assets/" + quote.getSource() + ".wav.mp3");
 //            context.startActivity(Intent.createChooser(i, "Share URL"));
+            return true;
+        }
+
+        private boolean shareDialogUrl(View v) {
+            Quote quote = (Quote) v.getTag();
+            Intent i = new Intent(Intent.ACTION_SEND);
+            i.setType("text/plain");
+            i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
+            i.putExtra(Intent.EXTRA_TEXT, "https://raw.githubusercontent.com/tomasz-herman/AncestorQuotes/master/app/src/main/assets/" + quote.getSource() + ".wav.mp3");
+            context.startActivity(Intent.createChooser(i, "Share URL"));
             return true;
         }
     }

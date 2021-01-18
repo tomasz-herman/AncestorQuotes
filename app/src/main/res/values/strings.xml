@@ -8,4 +8,9 @@
     <string name="about_paragraph_2">Ancestor Quotes is a simple soundboard application for Android containing quotes of Ancestor from Darkest Dungeon Game. The application looks up for a requested audio file included with this app. Source code of the application is available on <a href="https://github.com/tomasz-herman/AncestorQuotes">Github</a> under <a href="https://github.com/tomasz-herman/AncestorQuotes/blob/master/LICENSE">MIT License</a>. Game content and materials are trademarks and copyrights of their respective publisher and its licensors. All rights reserved.</string>
     <string name="about_paragraph_3">Many thanks to the creator of <a href="https://github.com/JoshLmao/DarkestDungeonResponseBot">Darkest Dungeon Response Bot</a> for providing all quotes in one json file. Darkest Dungeon Response Bot is available under <a href="https://github.com/JoshLmao/DarkestDungeonResponseBot/blob/master/LICENSE">MIT LICENCE</a>.</string>
     <string name="about_paragraph_4">Thanks to the creators and maintainers of the <a href="https://darkestdungeon.gamepedia.com/">Darkest Dungeon Gamepedia</a>.</string>
+    <string name="play_quote">Play Quote</string>
+    <string name="share_quote">Share Quote</string>
+    <string name="share_quote_url">Share Quote URL</string>
+    <string name="set_as_ringtone">Set as Ringtone</string>
+    <string name="save_locally">Save Locally</string>
 </resources>

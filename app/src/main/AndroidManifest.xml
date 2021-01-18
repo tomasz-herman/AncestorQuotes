@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.therman.ancestorquotes">
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <application
         android:name=".AncestorQuotes"
         android:allowBackup="true"
@@ -9,7 +10,7 @@
         android:roundIcon="@mipmap/ic_ancestor_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AboutActivity"></activity>
+        <activity android:name=".AboutActivity" />
         <activity android:name=".FavoritesActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -23,5 +24,4 @@
             android:grantUriPermissions="true"
             android:exported="true"/>
     </application>
-
 </manifest>

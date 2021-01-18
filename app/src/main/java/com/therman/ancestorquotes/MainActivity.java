@@ -10,8 +10,10 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -67,6 +69,14 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.I
         });
         setViewpagerSlideSensitivity(viewPager, 100);
         changeViewpagerScroller(viewPager);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if(!Settings.System.canWrite(getApplicationContext())) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                intent.setData(Uri.parse("package:com.therman.ancestorquotes"));
+                startActivity(intent);
+            }
+        }
     }
 
     private static void changeViewpagerScroller(ViewPager viewPager) {

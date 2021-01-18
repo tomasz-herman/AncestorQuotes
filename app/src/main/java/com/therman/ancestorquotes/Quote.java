@@ -2,9 +2,9 @@ package com.therman.ancestorquotes;
 
 public class Quote {
     private boolean alt = false;
-    private String source;
-    private String altSource;
-    private String text;
+    private final String source;
+    private final String altSource;
+    private final String text;
 
     public Quote(String source, String altSource, String text) {
         this.source = source;

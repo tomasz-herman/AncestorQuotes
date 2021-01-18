@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:title="@string/play_quote"
+        android:id="@+id/iPlayQuote"
+        app:showAsAction="never"/>
+    <item android:title="@string/share_quote"
+        android:id="@+id/iShareQuote"
+        app:showAsAction="never"/>
+    <item android:title="@string/share_quote_url"
+        android:id="@+id/iShareQuoteUrl"
+        app:showAsAction="never"/>
+    <item android:title="@string/set_as_ringtone"
+        android:id="@+id/iSetAsRingtone"
+        app:showAsAction="never"/>
+    <item android:title="@string/save_locally"
+        android:id="@+id/iSaveLocally"
+        app:showAsAction="never"/>
+</menu>
