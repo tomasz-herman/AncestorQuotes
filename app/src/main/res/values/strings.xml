@@ -13,4 +13,7 @@
     <string name="share_quote_url">Share Quote URL</string>
     <string name="set_as_ringtone">Set as Ringtone</string>
     <string name="save_locally">Save Locally</string>
+    <string name="set_as">Set as...</string>
+    <string name="set_as_alarm">Alarm</string>
+    <string name="set_as_notification">Notification</string>
 </resources>

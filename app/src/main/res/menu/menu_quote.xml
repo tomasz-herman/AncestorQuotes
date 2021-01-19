@@ -10,9 +10,20 @@
     <item android:title="@string/share_quote_url"
         android:id="@+id/iShareQuoteUrl"
         app:showAsAction="never"/>
-    <item android:title="@string/set_as_ringtone"
-        android:id="@+id/iSetAsRingtone"
-        app:showAsAction="never"/>
+    <item android:title="@string/set_as"
+        android:id="@+id/iSetAs">
+        <menu>
+            <item android:title="@string/set_as_ringtone"
+                android:id="@+id/iSetAsRingtone"
+                app:showAsAction="never"/>
+            <item android:title="@string/set_as_notification"
+                android:id="@+id/iSetAsNotification"
+                app:showAsAction="never"/>
+            <item android:title="@string/set_as_alarm"
+                android:id="@+id/iSetAsAlarm"
+                app:showAsAction="never"/>
+        </menu>
+    </item>
     <item android:title="@string/save_locally"
         android:id="@+id/iSaveLocally"
         app:showAsAction="never"/>

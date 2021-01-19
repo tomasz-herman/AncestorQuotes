@@ -178,11 +178,11 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
             AncestorQuotes.playQuote(quote);
         }
 
-        private void setRingtone(View v) {
+        private void setRingtone(View v, int type) {
             Uri theUri = Uri.parse("content://com.therman.ancestorquotes/" + ((Quote)v.getTag()).getSourceOrAltSource() + ".wav.mp3");
 
             RingtoneManager.setActualDefaultRingtoneUri(context,
-                    RingtoneManager.TYPE_RINGTONE, theUri);
+                    type, theUri);
         }
 
         private void saveLocally(View v) {
@@ -238,7 +238,13 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
                 shareDialogUrl(v);
                 return true;
             } else if (itemId == R.id.iSetAsRingtone) {
-                setRingtone(v);
+                setRingtone(v, RingtoneManager.TYPE_RINGTONE);
+                return true;
+            } else if (itemId == R.id.iSetAsNotification) {
+                setRingtone(v, RingtoneManager.TYPE_NOTIFICATION);
+                return true;
+            } else if (itemId == R.id.iSetAsAlarm) {
+                setRingtone(v, RingtoneManager.TYPE_ALARM);
                 return true;
             } else if (itemId == R.id.iSaveLocally) {
                 return true;
@@ -256,12 +262,6 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder> 
             shareIntent.setType("audio/*");
             shareIntent.putExtra(android.content.Intent.EXTRA_TEXT,((Quote)v.getTag()).getSource());
             context.startActivity(shareIntent);
-//            Quote quote = (Quote) v.getTag();
-//            Intent i = new Intent(Intent.ACTION_SEND);
-//            i.setType("text/plain");
-//            i.putExtra(Intent.EXTRA_SUBJECT, "Sharing URL");
-//            i.putExtra(Intent.EXTRA_TEXT, "https://raw.githubusercontent.com/tomasz-herman/AncestorQuotes/master/app/src/main/assets/" + quote.getSource() + ".wav.mp3");
-//            context.startActivity(Intent.createChooser(i, "Share URL"));
             return true;
         }
 
